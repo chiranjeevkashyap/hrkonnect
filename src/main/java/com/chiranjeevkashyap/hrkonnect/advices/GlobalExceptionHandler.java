@@ -1,9 +1,13 @@
 package com.chiranjeevkashyap.hrkonnect.advices;
 
+import com.chiranjeevkashyap.hrkonnect.exceptions.BusinessRuleViolationException;
 import com.chiranjeevkashyap.hrkonnect.exceptions.ResourceNotFoundException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,9 +29,31 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ResponseBody<?>> handleInternalServerError(MethodArgumentNotValidException exception) {
+    public ResponseEntity<ResponseBody<?>> handleMethodArgumentNotValidError(MethodArgumentNotValidException exception) {
         List<String> errors = exception.getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
         ResponseError error = ResponseError.builder().status(HttpStatus.BAD_REQUEST).error("Input validation failed.").errors(errors).build();
+        return buildResponseErrorEntity(error);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ResponseBody<?>> handleHttpMessageNotReadableError(HttpMessageNotReadableException exception) {
+        ResponseError error = ResponseError.builder().status(HttpStatus.BAD_REQUEST).error("Request body is required.").build();
+        return buildResponseErrorEntity(error);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ResponseBody<?>> handleConstraintViolationError(ConstraintViolationException exception) {
+        List<String> errors = exception.getConstraintViolations()
+                .stream()
+                .map(ConstraintViolation::getMessage)
+                .toList();
+        ResponseError error = ResponseError.builder().status(HttpStatus.BAD_REQUEST).error("Validation Failed.").errors(errors).build();
+        return buildResponseErrorEntity(error);
+    }
+
+    @ExceptionHandler(BusinessRuleViolationException.class)
+    public ResponseEntity<ResponseBody<?>> handleBusinessException(BusinessRuleViolationException exception) {
+        ResponseError error = ResponseError.builder().status(HttpStatus.CONFLICT).error("Business Rule Violation.").errors(List.of(exception.getMessage())).build();
         return buildResponseErrorEntity(error);
     }
 

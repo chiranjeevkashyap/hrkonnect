@@ -3,18 +3,19 @@ package com.chiranjeevkashyap.hrkonnect.entities;
 import com.chiranjeevkashyap.hrkonnect.enums.LeaveStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "leave_requests")
+@Table(name = "leave_requests", uniqueConstraints = {@UniqueConstraint(columnNames = {"applied_by_id", "from_date", "to_date"})})
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LeaveRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,6 +67,9 @@ public class LeaveRequest {
     @Size(max = 500, message = "Remarks cannot exceed 500 characters")
     @Column(length = 500)
     private String remarks;
+
+    @OneToOne(mappedBy = "leaveRequest")
+    private LeaveTransaction leaveTransaction;
 
     @PrePersist
     public void prePersist() {

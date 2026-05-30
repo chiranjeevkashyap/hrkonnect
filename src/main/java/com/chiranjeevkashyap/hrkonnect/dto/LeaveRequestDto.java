@@ -2,8 +2,13 @@ package com.chiranjeevkashyap.hrkonnect.dto;
 
 import com.chiranjeevkashyap.hrkonnect.enums.LeaveStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,13 +17,29 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+// Hide Null Values (Optional)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+        "id",
+        "appliedById",
+        "leaveTypeId",
+        "fromDate",
+        "toDate",
+        "totalDays",
+        "reason",
+        "status",
+        "appliedAt",
+        "approvedById",
+        "approvedAt",
+        "remarks"
+})
 public class LeaveRequestDto {
     private Long id;
 
-    @NotNull(message = "Applied By is required")
+    @NotNull(message = "Applied By Id is required")
     private Long appliedById;
 
-    @NotNull(message = "Leave Type is required")
+    @NotNull(message = "Leave Type Id is required")
     private Long leaveTypeId;
 
     @NotNull(message = "From date is required")
@@ -31,6 +52,7 @@ public class LeaveRequestDto {
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate toDate;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private float totalDays;
 
     @NotBlank(message = "Reason is required")
@@ -40,10 +62,12 @@ public class LeaveRequestDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LeaveStatus status;
 
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime appliedAt;
 
     private Long approvedById;
 
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime approvedAt;
 
     @Size(max = 500)

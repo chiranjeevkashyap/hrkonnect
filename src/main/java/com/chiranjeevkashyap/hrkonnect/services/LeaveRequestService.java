@@ -1,19 +1,19 @@
 package com.chiranjeevkashyap.hrkonnect.services;
 
 import com.chiranjeevkashyap.hrkonnect.dto.LeaveRequestDto;
-import com.chiranjeevkashyap.hrkonnect.entities.LeaveBalance;
 import com.chiranjeevkashyap.hrkonnect.entities.LeaveRequest;
 import com.chiranjeevkashyap.hrkonnect.entities.LeaveType;
 import com.chiranjeevkashyap.hrkonnect.entities.User;
+import com.chiranjeevkashyap.hrkonnect.exceptions.BusinessRuleViolationException;
 import com.chiranjeevkashyap.hrkonnect.exceptions.ResourceNotFoundException;
 import com.chiranjeevkashyap.hrkonnect.mappers.LeaveRequestMapper;
-import com.chiranjeevkashyap.hrkonnect.repositories.LeaveBalanceRepository;
 import com.chiranjeevkashyap.hrkonnect.repositories.LeaveRequestRepository;
 import com.chiranjeevkashyap.hrkonnect.repositories.LeaveTypeRepository;
 import com.chiranjeevkashyap.hrkonnect.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +22,6 @@ import java.util.Optional;
 public class LeaveRequestService {
     private final LeaveRequestRepository leaveRequestRepository;
     private final LeaveTypeRepository leaveTypeRepository;
-    private final LeaveBalanceRepository leaveBalanceRepository;
     private final UserRepository userRepository;
     private final LeaveRequestMapper mapper;
 
@@ -42,15 +41,25 @@ public class LeaveRequestService {
         throw new ResourceNotFoundException("Leave Request not found with id: " + id);
     }
 
-    public LeaveRequestDto createLeaveRequest(LeaveRequestDto leaveRequestDto) {
-        Optional<User> optionalUser = userRepository.findById(leaveRequestDto.getAppliedById());
-        if (optionalUser.isEmpty()) {
-            throw new ResourceNotFoundException("User not found with id: " + leaveRequestDto.getAppliedById());
+    public LeaveRequestDto createLeaveRequest(LeaveRequestDto dto) {
+        if (leaveRequestRepository.existsByAppliedByIdAndFromDateAndToDate(dto.getAppliedById(), dto.getFromDate(), dto.getToDate())) {
+            throw new BusinessRuleViolationException("A leave request already exists for the specified date range.");
         }
-        Optional<LeaveBalance> optionalLeaveBalance = leaveBalanceRepository.findById(leaveRequestDto.getLeaveTypeId());
-        if (optionalLeaveBalance.isEmpty()) {
-            throw new ResourceNotFoundException("Leave Balance not found with id: " + leaveRequestDto.getLeaveTypeId());
-        }
-        return mapper.toDto(leaveRequestRepository.save(mapper.toEntity(leaveRequestDto)));
+
+        User user = userRepository.findById(dto.getAppliedById()).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + dto.getAppliedById()));
+
+        LeaveType leaveType = leaveTypeRepository.findById(dto.getLeaveTypeId()).orElseThrow(() -> new ResourceNotFoundException("Leave type not found with id: " + dto.getLeaveTypeId()));
+
+        LeaveRequest entity = mapper.toEntity(dto);
+
+        entity.setAppliedBy(user);
+        entity.setLeaveType(leaveType);
+        long totalDays = ChronoUnit.DAYS.between(
+                dto.getFromDate(),
+                dto.getToDate()
+        ) + 1;
+        entity.setTotalDays(totalDays);
+
+        return mapper.toDto(leaveRequestRepository.save(entity));
     }
 }

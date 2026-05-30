@@ -1,7 +1,6 @@
 package com.chiranjeevkashyap.hrkonnect.services;
 
 import com.chiranjeevkashyap.hrkonnect.dto.LeaveBalanceDto;
-import com.chiranjeevkashyap.hrkonnect.entities.LeaveBalance;
 import com.chiranjeevkashyap.hrkonnect.mappers.LeaveBalanceMapper;
 import com.chiranjeevkashyap.hrkonnect.repositories.LeaveBalanceRepository;
 import lombok.RequiredArgsConstructor;

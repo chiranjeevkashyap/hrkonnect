@@ -40,4 +40,7 @@ public class LeaveBalance {
     private Integer remainingLeaves;
 
     private Integer year;
+
+    @OneToOne(mappedBy = "leaveBalance")
+    private LeaveTransaction leaveTransaction;
 }
