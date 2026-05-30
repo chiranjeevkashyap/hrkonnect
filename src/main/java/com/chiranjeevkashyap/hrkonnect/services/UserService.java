@@ -10,6 +10,9 @@ import com.chiranjeevkashyap.hrkonnect.mappers.UserMapper;
 import com.chiranjeevkashyap.hrkonnect.repositories.LeaveBalanceRepository;
 import com.chiranjeevkashyap.hrkonnect.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +20,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final LeaveBalanceRepository leaveBalanceRepository;
     private final UserMapper userMapper;
@@ -58,5 +61,13 @@ public class UserService {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("Employee not found with id: " + id);
         }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email).orElseThrow(() ->
+                new UsernameNotFoundException(
+                        "User not found with email: " + email
+                ));
     }
 }
