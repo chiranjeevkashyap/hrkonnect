@@ -14,14 +14,12 @@ import com.chiranjeevkashyap.hrkonnect.repositories.UserRepository;
 import com.chiranjeevkashyap.hrkonnect.security.JwtUserPrinciple;
 import com.chiranjeevkashyap.hrkonnect.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,29 +31,28 @@ public class LeaveRequestService {
     private final SecurityUtils securityUtils;
 
     public List<LeaveRequestDto> getLeaveRequests() {
-        List<LeaveRequest> leaveRequests = leaveRequestRepository.findAll();
+        List<LeaveRequest> leaveRequests = leaveRequestRepository.findByAppliedById(getCurrentUser().getId());
         if (leaveRequests.isEmpty()) {
-            throw new ResourceNotFoundException("Ready to create first Leave Request");
+            throw new ResourceNotFoundException("Ready to create your first Leave Request");
         }
         return mapper.toDtoList(leaveRequests);
     }
 
     public LeaveRequestDto getLeaveRequestById(Long id) {
-        Optional<LeaveRequest> leaveRequest = leaveRequestRepository.findById(id);
-        if (leaveRequest.isPresent()) {
-            return mapper.toDto(leaveRequest.get());
-        }
-        throw new ResourceNotFoundException("Leave Request not found with id: " + id);
+        return mapper.toDto(leaveRequestRepository.findByAppliedByIdAndId(getCurrentUser().getId(), id).orElseThrow(
+                () -> new ResourceNotFoundException("Leave Request not found with id: " + id)
+        ));
     }
 
     public LeaveRequestDto createLeaveRequest(LeaveRequestDto dto) {
-        if (leaveRequestRepository.existsByAppliedByIdAndFromDateAndToDate(dto.getAppliedById(), dto.getFromDate(), dto.getToDate())) {
+        User user = getCurrentUser();
+        if (leaveRequestRepository.existsByAppliedByIdAndFromDateAndToDate(user.getId(), dto.getFromDate(), dto.getToDate())) {
             throw new BusinessRuleViolationException("A leave request already exists for the specified date range.");
         }
 
-        User user = userRepository.findById(dto.getAppliedById()).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + dto.getAppliedById()));
-
-        LeaveType leaveType = leaveTypeRepository.findById(dto.getLeaveTypeId()).orElseThrow(() -> new ResourceNotFoundException("Leave type not found with id: " + dto.getLeaveTypeId()));
+        LeaveType leaveType = leaveTypeRepository.findById(dto.getLeaveTypeId()).orElseThrow(
+                () -> new ResourceNotFoundException("Leave type not found with id: " + dto.getLeaveTypeId())
+        );
 
         LeaveRequest entity = mapper.toEntity(dto);
 
@@ -78,30 +75,32 @@ public class LeaveRequestService {
     }
 
     public LeaveRequestDto approveLeaveRequest(Long id) {
-        JwtUserPrinciple hiringManager = securityUtils.getCurrentUser();
-        User user = userRepository.findById(hiringManager.userId()).orElseThrow(
-                () -> new UsernameNotFoundException("user not found with id: " + id)
-        );
-        LeaveRequest leaveRequest = leaveRequestRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Leave Request not found with id: " + id)
-        );
-        leaveRequest.setApprovedAt(LocalDateTime.now());
-        leaveRequest.setApprovedBy(user);
-        leaveRequest.setStatus(LeaveStatus.APPROVED);
-        return mapper.toDto(leaveRequestRepository.save(leaveRequest));
+        return modifyLeaveRequest(id, LeaveStatus.APPROVED);
     }
 
     public LeaveRequestDto rejectLeaveRequest(Long id) {
-        JwtUserPrinciple hiringManager = securityUtils.getCurrentUser();
-        User user = userRepository.findById(hiringManager.userId()).orElseThrow(
-                () -> new UsernameNotFoundException("user not found with id: " + id)
-        );
-        LeaveRequest leaveRequest = leaveRequestRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Leave Request not found with id: " + id)
-        );
+        return modifyLeaveRequest(id, LeaveStatus.REJECTED);
+    }
+
+    private LeaveRequestDto modifyLeaveRequest(Long id, LeaveStatus leaveStatus) {
+        User user = getCurrentUser();
+        LeaveRequest leaveRequest = getLeaveRequest(id);
         leaveRequest.setApprovedAt(LocalDateTime.now());
         leaveRequest.setApprovedBy(user);
-        leaveRequest.setStatus(LeaveStatus.REJECTED);
+        leaveRequest.setStatus(leaveStatus);
         return mapper.toDto(leaveRequestRepository.save(leaveRequest));
+    }
+
+    private LeaveRequest getLeaveRequest(Long id) {
+        return leaveRequestRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Leave Request not found with id: " + id)
+        );
+    }
+
+    private User getCurrentUser() {
+        JwtUserPrinciple jwtUserPrinciple = securityUtils.getCurrentUser();
+        return userRepository.findById(jwtUserPrinciple.userId()).orElseThrow(
+                () -> new UsernameNotFoundException("User not found with id: " + jwtUserPrinciple.userId())
+        );
     }
 }

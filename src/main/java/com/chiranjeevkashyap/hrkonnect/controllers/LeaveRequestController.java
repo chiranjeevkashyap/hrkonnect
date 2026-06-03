@@ -30,19 +30,19 @@ public class LeaveRequestController {
         return new ResponseEntity<>(leaveRequestService.createLeaveRequest(leaveRequestDto), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{id}/")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> cancelLeaveRequest(@PathVariable Long id){
         leaveRequestService.cancelLeaveRequest(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Leave Request deleted with id: " + id);
     }
 
-    @GetMapping("/{id}/approve")
+    @GetMapping("/approve/{id}")
     @PreAuthorize("hasRole('HR')")
     public ResponseEntity<LeaveRequestDto> approveLeaveRequest(@PathVariable Long id){
         return ResponseEntity.ok(leaveRequestService.approveLeaveRequest(id));
     }
 
-    @GetMapping("/{id}/reject")
+    @GetMapping("/reject/{id}")
     @PreAuthorize("hasRole('HR')")
     public ResponseEntity<LeaveRequestDto> rejectLeaveRequest(@PathVariable Long id){
         return ResponseEntity.ok(leaveRequestService.rejectLeaveRequest(id));

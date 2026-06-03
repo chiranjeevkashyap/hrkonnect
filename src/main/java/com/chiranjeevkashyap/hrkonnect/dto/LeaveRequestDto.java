@@ -36,7 +36,6 @@ import java.time.LocalDateTime;
 public class LeaveRequestDto {
     private Long id;
 
-    @NotNull(message = "Applied By Id is required")
     private Long appliedById;
 
     @NotNull(message = "Leave Type Id is required")
