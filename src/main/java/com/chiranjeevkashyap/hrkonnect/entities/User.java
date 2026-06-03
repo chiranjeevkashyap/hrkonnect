@@ -34,7 +34,8 @@ public class User implements UserDetails {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'USER'")
+    private Role role = Role.USER;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore

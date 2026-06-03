@@ -1,6 +1,8 @@
+INSERT INTO users (name, email, password)
+VALUES ('Aarav Sharma', 'aarav.sharma@gmail.com', '$2a$10$JEfEh7RJnZtyGBzrl1NOcOU7zYZQcg82jWibDXOmbKKdB9VmaPtCq');
+
 INSERT INTO users (name, email)
-VALUES ('Aarav Sharma', 'aarav.sharma@gmail.com'),
-       ('Priya Verma', 'priya.verma@gmail.com'),
+VALUES ('Priya Verma', 'priya.verma@gmail.com'),
        ('Rohan Mehta', 'rohan.mehta@gmail.com'),
        ('Sneha Kapoor', 'sneha.kapoor@gmail.com'),
        ('Vikram Singh', 'vikram.singh@gmail.com'),
