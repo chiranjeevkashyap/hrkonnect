@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,4 +29,23 @@ public class LeaveRequestController {
     public ResponseEntity<?> createLeaveRequest(@RequestBody @Valid LeaveRequestDto leaveRequestDto) {
         return new ResponseEntity<>(leaveRequestService.createLeaveRequest(leaveRequestDto), HttpStatus.CREATED);
     }
+
+    @DeleteMapping("/{id}/")
+    public ResponseEntity<?> cancelLeaveRequest(@PathVariable Long id){
+        leaveRequestService.cancelLeaveRequest(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/approve")
+    @PreAuthorize("hasRole('HR')")
+    public ResponseEntity<LeaveRequestDto> approveLeaveRequest(@PathVariable Long id){
+        return ResponseEntity.ok(leaveRequestService.approveLeaveRequest(id));
+    }
+
+    @GetMapping("/{id}/reject")
+    @PreAuthorize("hasRole('HR')")
+    public ResponseEntity<LeaveRequestDto> rejectLeaveRequest(@PathVariable Long id){
+        return ResponseEntity.ok(leaveRequestService.rejectLeaveRequest(id));
+    }
+
 }
