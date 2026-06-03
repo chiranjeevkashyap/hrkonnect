@@ -47,7 +47,6 @@ public class AuthUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-
         String role = claims.get("role", String.class);
         Long userId = Long.parseLong(claims.get("userId",String.class));
         return new JwtUserPrinciple(userId, claims.getSubject(),role);

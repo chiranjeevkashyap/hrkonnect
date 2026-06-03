@@ -9,6 +9,8 @@ import com.chiranjeevkashyap.hrkonnect.mappers.LeaveBalanceMapper;
 import com.chiranjeevkashyap.hrkonnect.mappers.UserMapper;
 import com.chiranjeevkashyap.hrkonnect.repositories.LeaveBalanceRepository;
 import com.chiranjeevkashyap.hrkonnect.repositories.UserRepository;
+import com.chiranjeevkashyap.hrkonnect.security.JwtUserPrinciple;
+import com.chiranjeevkashyap.hrkonnect.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,31 +28,35 @@ public class UserService implements UserDetailsService {
     private final LeaveBalanceRepository leaveBalanceRepository;
     private final UserMapper userMapper;
     private final LeaveBalanceMapper leaveBalanceMapper;
+    private final SecurityUtils securityUtils;
 
     public List<UserDto> getUsers() {
         return userMapper.toDtoList(userRepository.findAll());
     }
 
-    public UserDto getUser(Long id) {
-        Optional<User> user = userRepository.findById(id);
+    public UserDto getUser() {
+        JwtUserPrinciple jwtUserPrinciple = securityUtils.getCurrentUser();
+        Optional<User> user = userRepository.findById(jwtUserPrinciple.userId());
         if (user.isPresent()) {
             return userMapper.toDto(user.get());
         }
-        throw new ResourceNotFoundException("Employee not found with id: " + id);
+        throw new ResourceNotFoundException("Employee not found with id: " + jwtUserPrinciple.userId());
     }
 
-    public List<LeaveBalanceDto> getBalances(Long id) {
-        isUserExistById(id);
-        List<LeaveBalance> leaveBalances = leaveBalanceRepository.findByUserId(id);
+    public List<LeaveBalanceDto> getBalances() {
+        JwtUserPrinciple jwtUserPrinciple = securityUtils.getCurrentUser();
+        isUserExistById(jwtUserPrinciple.userId());
+        List<LeaveBalance> leaveBalances = leaveBalanceRepository.findByUserId(jwtUserPrinciple.userId());
         if (leaveBalances.isEmpty()) {
-            throw new ResourceNotFoundException("Employee Leave Summary not found with id: " + id);
+            throw new ResourceNotFoundException("Employee Leave Summary not found with id: " + jwtUserPrinciple.userId());
         }
         return leaveBalanceMapper.toDtoList(leaveBalances);
     }
 
-    public LeaveBalanceDto getBalance(Long id, Long typeId) {
-        isUserExistById(id);
-        Optional<LeaveBalance> leaveBalance = leaveBalanceRepository.findByUserIdAndLeaveTypeId(id, typeId);
+    public LeaveBalanceDto getBalance(Long typeId) {
+        JwtUserPrinciple jwtUserPrinciple = securityUtils.getCurrentUser();
+        isUserExistById(jwtUserPrinciple.userId());
+        Optional<LeaveBalance> leaveBalance = leaveBalanceRepository.findByUserIdAndLeaveTypeId(jwtUserPrinciple.userId(), typeId);
         if (leaveBalance.isPresent()) {
             return leaveBalanceMapper.toDto(leaveBalance.get());
         }
@@ -64,6 +70,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    @NullMarked
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
