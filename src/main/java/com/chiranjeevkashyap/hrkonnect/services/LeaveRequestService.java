@@ -11,7 +11,7 @@ import com.chiranjeevkashyap.hrkonnect.mappers.LeaveRequestMapper;
 import com.chiranjeevkashyap.hrkonnect.repositories.LeaveRequestRepository;
 import com.chiranjeevkashyap.hrkonnect.repositories.LeaveTypeRepository;
 import com.chiranjeevkashyap.hrkonnect.repositories.UserRepository;
-import com.chiranjeevkashyap.hrkonnect.records.JwtUserPrinciple;
+import com.chiranjeevkashyap.hrkonnect.records.ContextUser;
 import com.chiranjeevkashyap.hrkonnect.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -98,9 +98,9 @@ public class LeaveRequestService {
     }
 
     private User getCurrentUser() {
-        JwtUserPrinciple jwtUserPrinciple = securityUtils.getCurrentUser();
-        return userRepository.findById(jwtUserPrinciple.userId()).orElseThrow(
-                () -> new UsernameNotFoundException("User not found with id: " + jwtUserPrinciple.userId())
+        ContextUser contextUser = securityUtils.getCurrentUser();
+        return userRepository.findById(contextUser.userId()).orElseThrow(
+                () -> new UsernameNotFoundException("User not found with id: " + contextUser.userId())
         );
     }
 }

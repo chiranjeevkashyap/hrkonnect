@@ -1,6 +1,6 @@
 package com.chiranjeevkashyap.hrkonnect.records;
 
-public record JwtUserPrinciple(
+public record ContextUser(
         Long userId,
         String email,
         String role

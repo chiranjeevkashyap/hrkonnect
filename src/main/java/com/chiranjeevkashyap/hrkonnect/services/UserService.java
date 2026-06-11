@@ -7,9 +7,9 @@ import com.chiranjeevkashyap.hrkonnect.entities.User;
 import com.chiranjeevkashyap.hrkonnect.exceptions.ResourceNotFoundException;
 import com.chiranjeevkashyap.hrkonnect.mappers.LeaveBalanceMapper;
 import com.chiranjeevkashyap.hrkonnect.mappers.UserMapper;
+import com.chiranjeevkashyap.hrkonnect.records.ContextUser;
 import com.chiranjeevkashyap.hrkonnect.repositories.LeaveBalanceRepository;
 import com.chiranjeevkashyap.hrkonnect.repositories.UserRepository;
-import com.chiranjeevkashyap.hrkonnect.records.JwtUserPrinciple;
 import com.chiranjeevkashyap.hrkonnect.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
@@ -39,28 +39,28 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDto getUser() {
-        JwtUserPrinciple jwtUserPrinciple = securityUtils.getCurrentUser();
-        Optional<User> user = userRepository.findById(jwtUserPrinciple.userId());
+        ContextUser contextUser = securityUtils.getCurrentUser();
+        Optional<User> user = userRepository.findById(contextUser.userId());
         if (user.isPresent()) {
             return userMapper.toDto(user.get());
         }
-        throw new ResourceNotFoundException("Employee not found with id: " + jwtUserPrinciple.userId());
+        throw new ResourceNotFoundException("Employee not found with id: " + contextUser.userId());
     }
 
     public List<LeaveBalanceDto> getBalances() {
-        JwtUserPrinciple jwtUserPrinciple = securityUtils.getCurrentUser();
-        isUserExistById(jwtUserPrinciple.userId());
-        List<LeaveBalance> leaveBalances = leaveBalanceRepository.findByUserId(jwtUserPrinciple.userId());
+        ContextUser contextUser = securityUtils.getCurrentUser();
+        isUserExistById(contextUser.userId());
+        List<LeaveBalance> leaveBalances = leaveBalanceRepository.findByUserId(contextUser.userId());
         if (leaveBalances.isEmpty()) {
-            throw new ResourceNotFoundException("Employee Leave Summary not found with id: " + jwtUserPrinciple.userId());
+            throw new ResourceNotFoundException("Employee Leave Summary not found with id: " + contextUser.userId());
         }
         return leaveBalanceMapper.toDtoList(leaveBalances);
     }
 
     public LeaveBalanceDto getBalance(Long typeId) {
-        JwtUserPrinciple jwtUserPrinciple = securityUtils.getCurrentUser();
-        isUserExistById(jwtUserPrinciple.userId());
-        Optional<LeaveBalance> leaveBalance = leaveBalanceRepository.findByUserIdAndLeaveTypeId(jwtUserPrinciple.userId(), typeId);
+        ContextUser contextUser = securityUtils.getCurrentUser();
+        isUserExistById(contextUser.userId());
+        Optional<LeaveBalance> leaveBalance = leaveBalanceRepository.findByUserIdAndLeaveTypeId(contextUser.userId(), typeId);
         if (leaveBalance.isPresent()) {
             return leaveBalanceMapper.toDto(leaveBalance.get());
         }

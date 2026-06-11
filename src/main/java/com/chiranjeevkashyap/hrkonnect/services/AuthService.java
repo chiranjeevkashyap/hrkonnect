@@ -34,17 +34,25 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(Role.USER);
         userRepository.save(user);
-
         String token = jwtService.generateJwtToken(user);
         return new AuthResponse(token);
     }
 
     public AuthResponse login(LoginRequest request) {
-        Authentication authenticate = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.email(),
+                        request.password()
+                )
         );
-        User user = (User) authenticate.getPrincipal();
+
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof User user)) {
+            throw new IllegalStateException("Authentication principal is not of type User.");
+        }
+
         String token = jwtService.generateJwtToken(user);
-        return new AuthResponse(token);
+
+        return AuthResponse.builder().token(token).build();
     }
 }
