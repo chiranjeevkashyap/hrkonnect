@@ -1,8 +1,8 @@
-package com.chiranjeevkashyap.hrkonnect.dto.requests;
+package com.chiranjeevkashyap.hrkonnect.records;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record loginRequest(
+public record LoginRequest(
         @NotBlank(message = "email is required")
         String email,
 

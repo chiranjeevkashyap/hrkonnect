@@ -11,7 +11,7 @@ import com.chiranjeevkashyap.hrkonnect.mappers.LeaveRequestMapper;
 import com.chiranjeevkashyap.hrkonnect.repositories.LeaveRequestRepository;
 import com.chiranjeevkashyap.hrkonnect.repositories.LeaveTypeRepository;
 import com.chiranjeevkashyap.hrkonnect.repositories.UserRepository;
-import com.chiranjeevkashyap.hrkonnect.security.JwtUserPrinciple;
+import com.chiranjeevkashyap.hrkonnect.records.JwtUserPrinciple;
 import com.chiranjeevkashyap.hrkonnect.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

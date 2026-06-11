@@ -1,4 +1,4 @@
-package com.chiranjeevkashyap.hrkonnect.security;
+package com.chiranjeevkashyap.hrkonnect.records;
 
 public record JwtUserPrinciple(
         Long userId,

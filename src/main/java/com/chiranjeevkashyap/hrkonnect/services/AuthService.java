@@ -1,8 +1,8 @@
 package com.chiranjeevkashyap.hrkonnect.services;
 
-import com.chiranjeevkashyap.hrkonnect.dto.requests.RegisterRequest;
-import com.chiranjeevkashyap.hrkonnect.dto.requests.loginRequest;
-import com.chiranjeevkashyap.hrkonnect.dto.responses.AuthResponse;
+import com.chiranjeevkashyap.hrkonnect.records.RegisterRequest;
+import com.chiranjeevkashyap.hrkonnect.records.LoginRequest;
+import com.chiranjeevkashyap.hrkonnect.records.AuthResponse;
 import com.chiranjeevkashyap.hrkonnect.entities.User;
 import com.chiranjeevkashyap.hrkonnect.enums.Role;
 import com.chiranjeevkashyap.hrkonnect.repositories.UserRepository;
@@ -39,7 +39,7 @@ public class AuthService {
         return new AuthResponse(token);
     }
 
-    public AuthResponse login(loginRequest request) {
+    public AuthResponse login(LoginRequest request) {
         Authentication authenticate = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );

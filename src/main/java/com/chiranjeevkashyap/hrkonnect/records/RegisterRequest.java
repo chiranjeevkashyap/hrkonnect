@@ -1,4 +1,4 @@
-package com.chiranjeevkashyap.hrkonnect.dto.requests;
+package com.chiranjeevkashyap.hrkonnect.records;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -9,7 +9,7 @@ import com.chiranjeevkashyap.hrkonnect.mappers.LeaveBalanceMapper;
 import com.chiranjeevkashyap.hrkonnect.mappers.UserMapper;
 import com.chiranjeevkashyap.hrkonnect.repositories.LeaveBalanceRepository;
 import com.chiranjeevkashyap.hrkonnect.repositories.UserRepository;
-import com.chiranjeevkashyap.hrkonnect.security.JwtUserPrinciple;
+import com.chiranjeevkashyap.hrkonnect.records.JwtUserPrinciple;
 import com.chiranjeevkashyap.hrkonnect.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
@@ -31,7 +31,11 @@ public class UserService implements UserDetailsService {
     private final SecurityUtils securityUtils;
 
     public List<UserDto> getUsers() {
-        return userMapper.toDtoList(userRepository.findAll());
+        List<User> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            throw new ResourceNotFoundException("No Employee Exist.");
+        }
+        return userMapper.toDtoList(users);
     }
 
     public UserDto getUser() {

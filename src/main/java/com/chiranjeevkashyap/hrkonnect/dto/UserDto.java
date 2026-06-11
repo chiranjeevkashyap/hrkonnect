@@ -1,5 +1,6 @@
 package com.chiranjeevkashyap.hrkonnect.dto;
 
+import com.chiranjeevkashyap.hrkonnect.enums.Role;
 import lombok.*;
 
 @Getter
@@ -11,4 +12,7 @@ public class UserDto {
     private Long id;
     private String name;
     private String email;
+    private Role role;
+    private String username;
+
 }

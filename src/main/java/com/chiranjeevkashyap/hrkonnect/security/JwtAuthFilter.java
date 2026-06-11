@@ -1,6 +1,7 @@
 package com.chiranjeevkashyap.hrkonnect.security;
 
 
+import com.chiranjeevkashyap.hrkonnect.records.JwtUserPrinciple;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

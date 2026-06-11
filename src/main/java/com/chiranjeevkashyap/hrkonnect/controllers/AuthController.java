@@ -1,8 +1,8 @@
 package com.chiranjeevkashyap.hrkonnect.controllers;
 
-import com.chiranjeevkashyap.hrkonnect.dto.requests.RegisterRequest;
-import com.chiranjeevkashyap.hrkonnect.dto.requests.loginRequest;
-import com.chiranjeevkashyap.hrkonnect.dto.responses.AuthResponse;
+import com.chiranjeevkashyap.hrkonnect.records.RegisterRequest;
+import com.chiranjeevkashyap.hrkonnect.records.LoginRequest;
+import com.chiranjeevkashyap.hrkonnect.records.AuthResponse;
 import com.chiranjeevkashyap.hrkonnect.services.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody @Valid loginRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 }
