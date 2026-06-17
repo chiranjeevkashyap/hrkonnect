@@ -1,0 +1,17 @@
+package com.chiranjeevkashyap.hrkonnect.finder;
+
+import com.chiranjeevkashyap.hrkonnect.entities.User;
+import com.chiranjeevkashyap.hrkonnect.exceptions.ResourceNotFoundException;
+import com.chiranjeevkashyap.hrkonnect.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class UserFinder {
+    private final UserRepository repository;
+
+    public User findById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+    }
+}

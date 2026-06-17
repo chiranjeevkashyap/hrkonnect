@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 public class SecurityUtils {
     public ContextUser getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof ContextUser contextUser)) {
             throw new RuntimeException("No authenticated user found.");
         }
-        return (ContextUser) authentication.getPrincipal();
+        return contextUser;
     }
 }

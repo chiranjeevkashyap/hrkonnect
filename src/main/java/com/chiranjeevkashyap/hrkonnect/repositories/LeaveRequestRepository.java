@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long> {
     List<LeaveRequest> findByAppliedById(Long appliedBy);
+
     Optional<LeaveRequest> findByAppliedByIdAndId(Long appliedById, Long requestId);
+
     boolean existsByAppliedByIdAndFromDateAndToDate(Long appliedById, LocalDate fromDate, LocalDate toDate);
 }

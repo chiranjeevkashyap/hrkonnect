@@ -5,6 +5,7 @@ import com.chiranjeevkashyap.hrkonnect.dto.UserDto;
 import com.chiranjeevkashyap.hrkonnect.entities.LeaveBalance;
 import com.chiranjeevkashyap.hrkonnect.entities.User;
 import com.chiranjeevkashyap.hrkonnect.exceptions.ResourceNotFoundException;
+import com.chiranjeevkashyap.hrkonnect.finder.UserFinder;
 import com.chiranjeevkashyap.hrkonnect.mappers.LeaveBalanceMapper;
 import com.chiranjeevkashyap.hrkonnect.mappers.UserMapper;
 import com.chiranjeevkashyap.hrkonnect.records.ContextUser;
@@ -24,6 +25,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
+    private final UserFinder userFinder;
     private final UserRepository userRepository;
     private final LeaveBalanceRepository leaveBalanceRepository;
     private final UserMapper userMapper;
@@ -40,11 +42,8 @@ public class UserService implements UserDetailsService {
 
     public UserDto getUser() {
         ContextUser contextUser = securityUtils.getCurrentUser();
-        Optional<User> user = userRepository.findById(contextUser.userId());
-        if (user.isPresent()) {
-            return userMapper.toDto(user.get());
-        }
-        throw new ResourceNotFoundException("Employee not found with id: " + contextUser.userId());
+        User user = userFinder.findById(contextUser.userId());
+        return userMapper.toDto(user);
     }
 
     public List<LeaveBalanceDto> getBalances() {
