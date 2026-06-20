@@ -1,9 +1,11 @@
+INSERT INTO users (name, email, password, role)
+VALUES ('Aarav Sharma', 'aarav.sharma@gmail.com', '$2a$10$NH.Sf0blamaULK/jSH9MzuF7aQeJIQ5YHBX3EuKGD1vQPPl7wHEQy', 'ADMIN');
+
 INSERT INTO users (name, email, password)
-VALUES ('Aarav Sharma', 'aarav.sharma@gmail.com', '$2a$10$JEfEh7RJnZtyGBzrl1NOcOU7zYZQcg82jWibDXOmbKKdB9VmaPtCq');
+VALUES ('Priya Verma', 'priya.verma@gmail.com', '$2a$10$IWGR7TDrIGtSXpTY8QV6HeC9TiCxzQSHzsWTGWc825Zq6cka805bm');
 
 INSERT INTO users (name, email)
-VALUES ('Priya Verma', 'priya.verma@gmail.com'),
-       ('Rohan Mehta', 'rohan.mehta@gmail.com'),
+VALUES ('Rohan Mehta', 'rohan.mehta@gmail.com'),
        ('Sneha Kapoor', 'sneha.kapoor@gmail.com'),
        ('Vikram Singh', 'vikram.singh@gmail.com'),
        ('Ananya Joshi', 'ananya.joshi@gmail.com'),

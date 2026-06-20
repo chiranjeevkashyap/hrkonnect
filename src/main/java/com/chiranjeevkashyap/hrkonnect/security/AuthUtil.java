@@ -7,6 +7,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -45,11 +48,11 @@ public class AuthUtil {
         return new ContextUser(userId, claims.getSubject(), role);
     }
 
-    /*`public Long getCurrentUserId() {
+    public ContextUser getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof ContextUser userPrinciple)) {
-            throw new AuthenticationCredentialsNotFoundException("Jwt Not Found");
+        if (authentication == null || !(authentication.getPrincipal() instanceof ContextUser contextUser)) {
+            throw new AuthenticationCredentialsNotFoundException("No authenticated user found.");
         }
-        return userPrinciple.userId();
-    }*/
+        return contextUser;
+    }
 }

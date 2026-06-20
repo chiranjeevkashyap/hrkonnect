@@ -1,17 +1,18 @@
 package com.chiranjeevkashyap.hrkonnect;
 
-import com.chiranjeevkashyap.hrkonnect.services.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootTest
 class HrkonnectApplicationTests {
 	@Autowired
-	private UserService service;
+	private PasswordEncoder passwordEncoder;
 
 	@Test
-	void contextLoads() {
+	void encodePassword() {
+		System.out.println(passwordEncoder.encode("Priya@123"));
 	}
 
 }

@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class JwtAuthFilter extends OncePerRequestFilter {
-    AuthUtil authUtil;
+    private final AuthUtil authUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {

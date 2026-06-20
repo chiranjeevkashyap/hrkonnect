@@ -10,7 +10,7 @@ import com.chiranjeevkashyap.hrkonnect.finder.LeaveTypeFinder;
 import com.chiranjeevkashyap.hrkonnect.finder.UserFinder;
 import com.chiranjeevkashyap.hrkonnect.mappers.LeaveRequestMapper;
 import com.chiranjeevkashyap.hrkonnect.repositories.LeaveRequestRepository;
-import com.chiranjeevkashyap.hrkonnect.security.SecurityUtils;
+import com.chiranjeevkashyap.hrkonnect.security.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,10 +27,10 @@ public class LeaveRequestCommandService {
     private final LeaveTypeFinder leaveTypeFinder;
 
     private final UserFinder userFinder;
-    private final SecurityUtils securityUtils;
+    private final AuthUtil authUtil;
 
     public LeaveRequestDto createLeaveRequest(LeaveRequestDto dto) {
-        User user = getCurrentUser();
+        User user = userFinder.findById(authUtil.getCurrentUser().userId());
 
         if (repository.existsByAppliedByIdAndFromDateAndToDate(user.getId(), dto.getFromDate(), dto.getToDate())) {
             throw new BusinessRuleViolationException("A leave request already exists for the specified date range.");
@@ -60,7 +60,7 @@ public class LeaveRequestCommandService {
     }
 
     private LeaveRequestDto modifyLeaveRequest(Long id, LeaveStatus leaveStatus) {
-        User user = getCurrentUser();
+        User user = userFinder.findById(authUtil.getCurrentUser().userId());
 
         LeaveRequest leaveRequest = leaveRequestFinder.findById(id);
 
@@ -76,10 +76,6 @@ public class LeaveRequestCommandService {
     public void cancelLeaveRequest(Long id) {
         leaveRequestFinder.findById(id);
         repository.deleteById(id);
-    }
-
-    private User getCurrentUser() {
-        return userFinder.findById(securityUtils.getCurrentUser().userId());
     }
 }
 
